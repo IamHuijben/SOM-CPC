@@ -189,7 +189,7 @@ if __name__ == "__main__":
 
 
     if data_type == 'toycase':
-        data_loader = 'MixtureOfSinusoids'
+        data_loader = 'Synthetic'
     elif data_type == 'mass':
         data_loader = 'MassPSG'
     elif data_type == 'librispeech':

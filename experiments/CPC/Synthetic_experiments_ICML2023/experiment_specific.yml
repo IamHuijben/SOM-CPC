@@ -6,7 +6,7 @@ callbacks:
     checking_metric: loss
     every_n_epochs: 1
 data:
-  class: MixtureOfSinusoidsContrastive
+  class: SyntheticContrastive
   crop_size: 1
   crop_size_cs: 1
   include_channels:

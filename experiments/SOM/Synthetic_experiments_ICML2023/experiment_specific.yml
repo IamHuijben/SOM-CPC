@@ -11,7 +11,7 @@ callbacks:
     checking_metric: null
     every_n_epochs: 1
 data:
-  class: MixtureOfSinusoids
+  class: Synthetic
   crop_size: 1
   include_channels:
   - x

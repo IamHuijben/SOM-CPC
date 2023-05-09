@@ -16,7 +16,7 @@ import numpy as np
 import yaml 
 import warnings
 
-from dataloading.toy_dataloaders import MixtureOfSinusoids
+from dataloading.toy_dataloaders import Synthetic
 from dataloading.sleep_dataloader import MassPSG
 
 
@@ -126,7 +126,7 @@ if __name__ == "__main__":
 
 
         ### Load training data
-        data_loader = 'MixtureOfSinusoids' if data_type == 'toycase' else 'MassPSG' 
+        data_loader = 'Synthetic' if data_type == 'toycase' else 'MassPSG' 
         data_fold = 'train'
         data_set =  eval(data_loader)(config.data, data_fold)
 

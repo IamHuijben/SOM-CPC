@@ -7,7 +7,7 @@ from torch.utils.data import Dataset
 from random import choices
 import h5py
 
-class MixtureOfSinusoids(Dataset):
+class Synthetic(Dataset):
 
     def __init__(self, config, data_fold, **kwargs): 
         
@@ -119,7 +119,7 @@ class MixtureOfSinusoids(Dataset):
         return subject_strings
 
 
-class MixtureOfSinusoidsContrastive(MixtureOfSinusoids):
+class SyntheticContrastive(Synthetic):
     def __init__(self, config, data_fold, soft_labels=True, **kwargs):
         
         self.pos_samples = config.pos_samples
