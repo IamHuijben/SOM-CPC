@@ -1,0 +1,62 @@
+callbacks:
+  PlotLoss:
+    every_n_epochs: 5
+  SaveModel:
+    checking_metric: loss
+    every_n_epochs: 1
+data:
+  class: MixtureOfSinusoids
+  crop_size: 1
+  include_channels:
+  - x
+  include_train_subjects: all
+  include_val_subjects: all
+  load_dir: random_walk_freq_sinusoids
+  past_windows: 0
+device:
+  cuda: true
+  gpu_idx: null
+losses:
+  mse:
+    arguments:
+      reduction: sum
+    class: nn.MSELoss
+    multiplier: 1.0
+model:
+  type: sequential
+  checkpoint_path: null
+  classifier:
+    activation: null
+    bias: true
+    checkpoint_path: null
+    class: Classifier
+    dropouts: null
+    freeze: false
+    input_channels: 128
+    out_activation: null
+    output_channels:
+    - 1
+  encoder:
+    checkpoint_path: Null
+    freeze: True
+  module_order:
+  - encoder
+  - swap_dims
+  - classifier
+  - squeeze
+  squeeze:
+    class: Squeeze
+  swap_dims:
+    class: SwapDims
+    dims:
+    - -1
+    - -2
+optimizer:
+  lr: 0.01
+  type: Adam
+training:
+  data_shuffle: true
+  n_epochs: 1000
+  random_seed: 1
+  train_batch_size: 128
+  val_batch_size: 128

@@ -1,0 +1,107 @@
+model:
+  type: sequential
+  checkpoint_path: null # Overwrites the checkpoint_path entries of separate modules, to read in a full model.
+  encoder:
+    checkpoint_path: null
+    freeze: False         
+    activation:
+      type: leakyrelu
+    bias: True
+    channels: [16, 32, 64, 128]
+    class: ConvEncoder1D
+    dilations: 1
+    dropouts: 
+      '0': 0.1
+      '1': 0.1
+      '2': 0.1
+    input_dim:
+    - 5
+    - 3840
+    kernel_sizes:
+      '0': 15
+      '1': 9
+      '2': 5
+      '3': 3
+    out_activation: null
+    paddings: 0
+    poolings:
+      '0':
+        kernel_size: 5
+        type: Max
+      '1':
+        kernel_size: 5
+        type: Max
+      '2':
+        kernel_size: 5
+        type: Max
+      '3':
+        output_size: 1
+        type: AdaptiveAvg
+    stacked_convs: 1
+    strides: 1
+  classifier:
+    checkpoint_path: null
+    freeze: False
+    class: Classifier
+    input_channels: 128
+    output_channels: [6]
+    activation: null
+    bias: True    
+    dropouts: null
+    output_temperature: 1
+    out_activation:
+      dim: -1
+      type: LogSoftmax
+  ARmodel:
+    class: ARmodule
+    type: 'gru'
+    input_size: 128
+    output_size: 128
+    num_stacked: 1
+    bias: True
+    dropout: 0
+    bidirectional: False
+    freeze: False
+    checkpoint_path: null
+  squeeze:
+    class: Squeeze
+  swap_dims:
+    class: SwapDims
+    dims: [-1 , -2]
+  permute:
+    class: null
+    permutation:
+    - 2
+    - 0
+    - 1
+  select_last_element:
+    class: null #SelectLastElement
+  module_order: ['encoder', 'swap_dims', 'classifier', 'squeeze']
+losses:
+  mse:
+    arguments: 
+      reduction: 'sum'
+    class: nn.MSELoss
+    multiplier: 0.0
+  neg_likelihood:
+    arguments: 
+      reduction: 'sum'
+    class_weighing: False 
+    class: nn.NLLLoss
+    multiplier: 1.0
+    zero_class_nan: True
+optimizer:
+  lr: 0.0001
+  type: Adam
+training:
+  data_shuffle: True
+  n_epochs: 500
+  train_batch_size: 128
+  val_batch_size: 128
+  random_seed: 1
+callbacks: Null
+logging: Null
+device:
+  cuda: True
+  gpu_idx: null
+data: Null

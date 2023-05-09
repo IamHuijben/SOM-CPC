@@ -1,0 +1,102 @@
+data:
+  class: LibriSpeechContrastive
+  load_dir: Librispeech_preprocessed
+  crop_size: 0.01
+  crop_size_cs: 0.01
+  past_windows: 127
+  include_train_subjects: all
+  include_val_subjects: all
+  pos_samples: 12
+  neg_samples: 10
+  neg_sampling: naive 
+model:
+  type: CPCModel
+  checkpoint_path: null
+  encoder:
+    class: ConvEncoder1D
+    checkpoint_path: null
+    activation:
+      type: relu
+    bias: true
+    channels:
+    - 512
+    - 512
+    - 512
+    - 512
+    - 512
+    dilations: 1
+    dropouts: null
+    encode_windows_separately: false
+    freeze: false
+    input_dim:
+    - 1
+    - 160
+    kernel_sizes:
+      '0': 10
+      '1': 8
+      '2': 4
+      '3': 4
+      '4': 4
+    out_activation:
+      type: relu
+    paddings:
+      '0': 3
+      '1': 2
+      '2': 1
+      '3': 1
+      '4': 1
+    poolings: null
+    stacked_convs: 1
+    strides:
+      '0': 5
+      '1': 4
+      '2': 2
+      '3': 2
+      '4': 2
+  classifier:
+    class: Classifier
+    checkpoint_path: null
+    freeze: False
+    input_channels: 512
+    output_channels: [512]
+    activation: null
+    bias: False    
+    out_activation: null
+  ARmodel:
+    class: ARmodule
+    checkpoint_path: null
+    freeze: False
+    type: 'gru'
+    input_size: 512
+    output_size: 512
+    num_stacked: 1
+    bias: True
+    dropout: 0
+    bidirectional: False
+losses:
+  infoNCE:
+    class: InfoNCELoss
+    arguments:
+      neg_samples: 10
+      pos_samples: 12
+      reduction: sum
+    multiplier: 1.0
+training:
+  data_shuffle: True
+  n_epochs: 3000
+  train_batch_size: 8
+  val_batch_size: 8
+  random_seed: 1
+callbacks: 
+  PlotLoss:
+    every_n_epochs: 20
+    zero_class_is_nan_class: false
+  SaveModel:
+    every_n_epochs: 1
+    checking_metric: infoNCE
+device:
+  cuda: true
+  gpu_idx: null
+optimizer:
+  lr: 0.0001
+  type: Adam

@@ -1,0 +1,46 @@
+EEG:
+  channel_set_name: EEGs
+  all_channels:
+  - 'EEG F4-LER'
+  - 'EEG C4-LER'
+  - 'EEG O2-LER'
+  all_references:
+  - '-'
+  - '-'
+  - '-'
+  subset: 3
+  sample_rate_new: 128
+  sample_rate_orig: 256 
+  low_fc: 0.3
+  high_fc: 59
+  flexible_referencing: True
+  outlier_threshold: 0.0003
+EOG:
+  channel_set_name: EOGs
+  all_channels:
+  - 'EOG Right Horiz' 
+  - 'EOG Left Horiz'
+  all_references:
+  - '-'
+  - '-'
+  subset: 3
+  sample_rate_new: 128
+  sample_rate_orig: 256 
+  low_fc: 0.3
+  high_fc: 59
+  flexible_referencing: True
+  outlier_threshold: 0.0003
+EMG:
+  channel_set_name: EMGs
+  all_channels:
+  - 'EMG Chin1'
+  all_references:
+  - 'EMG Chin2'
+  subset: 3
+  sample_rate_new: 128
+  sample_rate_orig: 128
+  low_fc: 0.3
+  high_fc: 59
+  flexible_referencing: True
+  outlier_threshold: 0.0003
+ 

@@ -1,0 +1,77 @@
+callbacks:
+  PlotAccuracy:
+    every_n_epochs: 10
+    zero_class_is_nan_class: false
+  PlotCohensKappa:
+    every_n_epochs: 10
+    zero_class_is_nan_class: false
+  PlotLoss:
+    every_n_epochs: 10
+    zero_class_is_nan_class: false
+  SaveModel:
+    checking_metric: loss
+    every_n_epochs: 1
+data:
+  class: LibriSpeechFast
+  crop_size: 0.01
+  include_train_subjects: all
+  include_val_subjects: all
+  load_dir: Librispeech_preprocessed
+  past_windows: 127
+device:
+  cuda: true
+  gpu_idx: null
+losses:
+  neg_likelihood:
+    arguments:
+      reduction: sum
+    class: nn.NLLLoss
+    class_weighing: false
+    multiplier: 1.0
+    zero_class_nan: false
+model:
+  type: sequential
+  checkpoint_path: null
+  module_order:
+  - encoder
+  - permute
+  - ARmodel
+  - select_last_element
+  - classifier
+  ARmodel:
+    checkpoint_path: null
+    freeze: True
+  classifier:
+    activation: null
+    bias: true
+    checkpoint_path: null
+    class: Classifier
+    dropouts: null
+    freeze: false
+    input_channels: 512
+    out_activation:
+      dim: -1
+      type: LogSoftmax
+    output_channels:
+    - 10
+  encoder:
+    checkpoint_path: Null
+    freeze: True
+  permute:
+    class: Permute
+    permutation:
+    - 2
+    - 0
+    - 1
+  select_last_element:
+    class: SelectLastElement
+    axis: 0
+optimizer:
+  lr: 0.0001
+  type: Adam
+training:
+  data_shuffle: true
+  n_epochs: 200
+  random_seed: 1
+  train_batch_size: 128
+  val_batch_size: 128

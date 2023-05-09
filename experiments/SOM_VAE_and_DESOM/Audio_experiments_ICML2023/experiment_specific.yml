@@ -1,0 +1,191 @@
+callbacks:
+  PlotLoss:
+    every_n_epochs: 20
+  SOMmap:
+    checking_metric: null
+    every_n_epochs: 20
+    nr_nodes: 225
+    zero_class_is_nan_class: true
+  SaveModel:
+    checking_metric:
+    - mse_cont
+    - loss
+    - commitment_loss
+    - SOM_loss
+    every_n_epochs: 1
+data:
+  class: LibriSpeechFast
+  crop_size: 0.01
+  include_train_subjects: all
+  include_val_subjects: all
+  load_dir: Librispeech_preprocessed
+  past_windows: 127
+device:
+  cuda: true
+  gpu_idx: null
+losses:
+  SOM_loss:
+    arguments:
+      detach_from_encoder: false
+      reduction: sum
+      similarity_metric: mse
+    class: SOM_loss
+    multiplier: 1.0e-05
+  commitment_loss:
+    arguments:
+      detach_from_encoder: false
+      reduction: sum
+      similarity_metric: mse
+    class: commitment_loss
+    multiplier: 1.0e-05
+  mse_cont:
+    apply_on_out_vars:
+    - x_hat_cont
+    arguments:
+      reduction: sum
+    class: nn.MSELoss
+    multiplier: 1.0
+    name: mse_cont
+model:
+  ARmodel:
+    bias: true
+    bidirectional: false
+    checkpoint_path: null
+    class: ARmodule
+    dropout: 0
+    freeze: false
+    input_size: 1024
+    num_stacked: 1
+    output_size: 1024
+    type: gru
+  checkpoint_path: null
+  decoder_cont:
+    activation:
+      type: relu
+    bias: true
+    channels:
+    - 512
+    - 512
+    - 512
+    - 512
+    - 1
+    checkpoint_path: null
+    class: ConvDecoder1D
+    decode_past_windows: false
+    dilations: 1
+    dropouts: null
+    first_linear_layer:
+      activation: null
+      linear_layer: false
+      unflatten: true
+      unflatten_shape:
+      - 512
+      - 2
+    freeze: false
+    input_dim:
+    - 1024
+    kernel_sizes:
+      '0': 4
+      '1': 4
+      '2': 4
+      '3': 8
+      '4': 10
+    out_activation:
+      type: null
+    output_cropping: 0
+    output_paddings:
+      '0': 0
+      '1': 0
+      '2': 0
+      '3': 0
+      '4': 1
+    paddings:
+      '0': same
+      '1': 1
+      '2': 1
+      '3': 2
+      '4': 3
+    stacked_convs: 1
+    strides:
+      '0': 1
+      '1': 2
+      '2': 2
+      '3': 4
+      '4': 5
+    upconvs: single
+  decoder_disc:
+    class: null
+  encoder:
+    activation:
+      type: relu
+    bias: true
+    channels:
+    - 512
+    - 512
+    - 512
+    - 512
+    - 512
+    checkpoint_path: null
+    class: ConvEncoder1D
+    dilations: 1
+    dropouts: null
+    encode_windows_separately: false
+    freeze: false
+    input_dim:
+    - 1
+    - 160
+    input_padding:
+      class: null
+      padding:
+      - 18
+      - 17
+      value: 0
+    kernel_sizes:
+      '0': 10
+      '1': 8
+      '2': 4
+      '3': 4
+      '4': 4
+    last_linear_layer:
+      activation: null
+      first_flatten: false
+      linear_layer: false
+    out_activation:
+      type: relu
+    paddings:
+      '0': 3
+      '1': 2
+      '2': 1
+      '3': 1
+      '4': same
+    poolings: null
+    stacked_convs: 1
+    strides:
+      '0': 5
+      '1': 4
+      '2': 2
+      '3': 2
+      '4': 1
+  quantizer:
+    class: SOMQuantizer
+    freeze: false
+    gaussian_neighbourhood:
+      n_epochs: 3000
+      omit_center_weight: true
+      sigma_end: 0.1
+    som_nodes: 225
+    transitions: false
+    z_dim: 1024
+  type: SOM_VAE
+optimizer:
+  lr: 0.0001
+  type: Adam
+training:
+  aggregate_pred_names:
+  - all_codebook_idxs
+  - x_hat_cont
+  data_shuffle: true
+  n_epochs: 3000
+  random_seed: 1
+  train_batch_size: 8
+  val_batch_size: 8

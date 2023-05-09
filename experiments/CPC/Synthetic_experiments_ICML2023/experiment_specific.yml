@@ -1,0 +1,103 @@
+callbacks:
+  PlotLoss:
+    every_n_epochs: 20
+    zero_class_is_nan_class: false
+  SaveModel:
+    checking_metric: loss
+    every_n_epochs: 1
+data:
+  class: MixtureOfSinusoidsContrastive
+  crop_size: 1
+  crop_size_cs: 1
+  include_channels:
+  - x
+  include_train_subjects: all
+  include_val_subjects: all
+  load_dir: random_walk_freq_sinusoids_preprocessed
+  neg_samples: 3
+  neg_sampling: naive
+  past_windows: 0
+  pos_samples: 3
+device:
+  cuda: true
+  gpu_idx: null
+losses:
+  infoNCE:
+    arguments:
+      neg_samples: 3
+      pos_samples: 3
+      reduction: sum
+    class: InfoNCELoss
+    multiplier: 1.0
+model:
+  type: CPCModel
+  checkpoint_path: null
+  ARmodel:
+    class: null
+  classifier:
+    activation: null
+    bias: false
+    checkpoint_path: null
+    class: Classifier
+    freeze: false
+    input_channels: 128
+    out_activation: null
+    output_channels:
+    - 128
+  encoder:
+    type: CPCModel
+    checkpoint_path: null
+    activation:
+      type: leakyrelu
+    bias: true
+    channels:
+    - 16
+    - 32
+    - 64
+    - 128
+    class: ConvEncoder1D
+    dilations: 1
+    dropouts:
+      '0': 0.1
+      '1': 0.1
+      '2': 0.1
+    encode_windows_separately: true
+    freeze: false
+    input_dim:
+    - 1
+    - 128
+    kernel_sizes:
+      '0': 9
+      '1': 7
+      '2': 3
+      '3': 3
+    out_activation: null
+    paddings:
+      '0': 4
+      '1': 3
+      '2': 1
+      '3': 1
+    poolings:
+      '0':
+        kernel_size: 4
+        type: Max
+      '1':
+        kernel_size: 4
+        type: Max
+      '2':
+        kernel_size: 4
+        type: Max
+      '3':
+        kernel_size: 2
+        type: Max
+    stacked_convs: 1
+    strides: 1
+optimizer:
+  lr: 0.001
+  type: Adam
+training:
+  data_shuffle: true
+  n_epochs: 1000
+  random_seed: 1
+  train_batch_size: 128
+  val_batch_size: 128

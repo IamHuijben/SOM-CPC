@@ -1,0 +1,224 @@
+callbacks:
+  PlotLoss:
+    every_n_epochs: 20
+  SOMmap:
+    checking_metric: null
+    every_n_epochs: 20
+    nr_nodes: 100
+    zero_class_is_nan_class: true
+  SaveModel:
+    checking_metric:
+    - loss
+    - commitment_loss
+    - SOM_loss
+    - mse_cont
+    every_n_epochs: 1
+data:
+  class: MassPSG
+  crop_size: 30
+  include_channels:
+  - eeg c4-ler
+  - eeg f4-ler
+  - eeg o2-ler
+  - emg chin1_emg chin2
+  - eog right horiz
+  - eog left horiz
+  include_train_subjects: all
+  include_val_subjects: all
+  load_dir: mass_preprocessed
+  past_windows: 0
+device:
+  cuda: true
+  gpu_idx: null
+losses:
+  SOM_loss:
+    arguments:
+      detach_from_encoder: true
+      reduction: sum
+      similarity_metric: mse
+    class: SOM_loss
+    multiplier: 0.001
+  commitment_loss:
+    arguments:
+      detach_from_encoder: false
+      reduction: sum
+      similarity_metric: mse
+    class: commitment_loss
+    multiplier: 0.001
+  mse_cont:
+    apply_on_out_vars:
+    - x_hat_cont
+    arguments:
+      reduction: sum
+    class: nn.MSELoss
+    multiplier: 1.0
+    name: mse_cont
+  mse_disc:
+    apply_on_out_vars:
+    - x_hat_disc
+    arguments:
+      reduction: sum
+    class: nn.MSELoss
+    multiplier: 1.0
+    name: mse_disc
+model:
+  ARmodel:
+    class: null
+  checkpoint_path: null
+  decoder_cont:
+    activation:
+      type: leakyrelu
+    bias: true
+    channels:
+    - 64
+    - 32
+    - 16
+    - 6
+    checkpoint_path: null
+    class: ConvDecoder1D
+    decode_past_windows: false
+    dilations: 1
+    dropouts: null
+    first_linear_layer: null
+    freeze: false
+    input_dim:
+    - 128
+    - 27
+    kernel_sizes:
+      '0': 3
+      '1': 5
+      '2': 9
+      '3': 15
+    out_activation:
+      type: null
+    output_cropping:
+    - 18
+    - 17
+    output_paddings: 0
+    paddings:
+      '0': 1
+      '1': 2
+      '2': 4
+      '3': 7
+    stacked_convs: 1
+    strides:
+      '0': 1
+      '1': 5
+      '2': 5
+      '3': 5
+    upconvs: double
+  decoder_disc:
+    activation:
+      type: leakyrelu
+    bias: true
+    channels:
+    - 64
+    - 32
+    - 16
+    - 6
+    checkpoint_path: null
+    class: ConvDecoder1D
+    decode_past_windows: false
+    dilations: 1
+    dropouts: null
+    first_linear_layer: null
+    freeze: false
+    input_dim:
+    - 128
+    - 27
+    kernel_sizes:
+      '0': 3
+      '1': 5
+      '2': 9
+      '3': 15
+    out_activation:
+      type: null
+    output_cropping:
+    - 18
+    - 17
+    output_paddings: 0
+    paddings:
+      '0': 1
+      '1': 2
+      '2': 4
+      '3': 7
+    stacked_convs: 1
+    strides:
+      '0': 1
+      '1': 5
+      '2': 5
+      '3': 5
+    upconvs: double
+  encoder:
+    activation:
+      type: leakyrelu
+    bias: true
+    channels:
+    - 16
+    - 32
+    - 64
+    - 128
+    checkpoint_path: null
+    class: ConvEncoder1D
+    dilations: 1
+    dropouts:
+      '0': 0.1
+      '1': 0.1
+      '2': 0.1
+    encode_windows_separately: true
+    freeze: false
+    input_dim:
+    - 6
+    - 3840
+    input_padding:
+      class: ConstantPad1d
+      padding:
+      - 18
+      - 17
+      value: 0
+    kernel_sizes:
+      '0': 15
+      '1': 9
+      '2': 5
+      '3': 3
+    last_linear_layer: null
+    out_activation: null
+    paddings: 0
+    poolings:
+      '0':
+        kernel_size: 5
+        type: Max
+      '1':
+        kernel_size: 5
+        type: Max
+      '2':
+        kernel_size: 5
+        type: Max
+      '3':
+        type: null
+    stacked_convs: 1
+    strides: 1
+  quantizer:
+    class: SOMQuantizer
+    freeze: false
+    gaussian_neighbourhood:
+      n_epochs: 500
+      omit_center_weight: true
+      sigma_end: 0.1
+    som_nodes: 100
+    transitions: false
+    z_dim: 128
+  type: SOM_VAE
+optimizer:
+  lr: 0.0001
+  type: Adam
+training:
+  aggregate_pred_names:
+  - all_codebook_idxs
+  - x_hat_cont
+  - x_hat_disc
+  data_shuffle: true
+  n_epochs: 500
+  random_seed: 1
+  train_batch_size: 128
+  val_batch_size: 128

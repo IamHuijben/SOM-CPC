@@ -1,0 +1,72 @@
+callbacks:
+  PlotLoss:
+    every_n_epochs: 5
+    zero_class_is_nan_class: true
+  SOMmap:
+    checking_metric: null
+    every_n_epochs: 20
+    nr_nodes: 100
+    zero_class_is_nan_class: false
+  SaveModel:
+    checking_metric: null
+    every_n_epochs: 1
+data:
+  class: MassPSG
+  crop_size: 30
+  include_channels:
+  - eeg c4-ler
+  - eeg f4-ler
+  - eeg o2-ler
+  - emg chin1_emg chin2
+  - eog right horiz
+  - eog left horiz
+  include_train_subjects: all
+  include_val_subjects: all
+  load_dir:  mass_preprocessed
+  past_windows: 0
+device:
+  cuda: true
+  gpu_idx: null
+losses:
+  SOM_loss:
+    arguments:
+      reduction: sum
+    class: SOM_loss
+    multiplier: 1.0
+  commitment_loss:
+    arguments:
+      reduction: sum
+    class: commitment_loss
+    multiplier: 1.0
+model:
+  type: sequential
+  checkpoint_path: null
+  encoder:
+    checkpoint_path: null
+    freeze: true
+  quantizer:
+    checkpoint_path: null
+    class: SOMQuantizer
+    freeze: false
+    gaussian_neighbourhood:
+      n_epochs: 250
+      omit_center_weight: true
+      sigma_end: 0.1
+    som_nodes: 100
+    transitions: false
+    z_dim: 128
+  module_order:
+  - encoder
+  - quantizer
+optimizer:
+  lr: 0.0001
+  type: Adam
+training:
+  aggregate_pred_names:
+  - all_codebook_idxs
+  - all_z_cont
+  data_shuffle: true
+  n_epochs: 250
+  random_seed: 1
+  train_batch_size: 128
+  val_batch_size: 128

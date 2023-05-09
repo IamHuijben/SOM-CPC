@@ -1,0 +1,147 @@
+callbacks:
+  PlotLoss:
+    every_n_epochs: 20
+    zero_class_is_nan_class: true
+  SOMmap:
+    checking_metric: null
+    every_n_epochs: 10
+    nr_nodes: 100
+    zero_class_is_nan_class: true
+  SaveModel:
+    checking_metric:
+    - loss
+    - infoNCE
+    - commitment_loss
+    - SOM_loss
+    every_n_epochs: 1
+data:
+  class: MassContrastive
+  crop_size: 30
+  crop_size_cs: 30
+  include_channels:
+  - eeg c4-ler
+  - eeg f4-ler
+  - eeg o2-ler
+  - emg chin1_emg chin2
+  - eog right horiz
+  - eog left horiz
+  include_train_subjects: all
+  include_val_subjects: all
+  load_dir: mass_preprocessed
+  neg_samples: 3
+  neg_sampling: within_patient
+  past_windows: 0
+  pos_samples: 3
+device:
+  cuda: true
+  gpu_idx: null
+losses:
+  SOM_loss:
+    arguments:
+      detach_from_encoder: true
+      reduction: sum
+      similarity_metric: mse
+    class: SOM_loss
+    multiplier: 0.001
+  commitment_loss:
+    arguments:
+      detach_from_encoder: false
+      reduction: sum
+      similarity_metric: mse
+    class: commitment_loss
+    multiplier: 0.001
+  infoNCE:
+    arguments:
+      neg_samples: 3
+      norm_cos_sim: false
+      pos_samples: 3
+      reduction: sum
+      temperature: 1
+      weighing_prediction_losses: null
+    class: InfoNCELoss
+    multiplier: 1.0
+model:
+  ARmodel:
+    class: null
+  checkpoint_path: null
+  classifier:
+    activation: null
+    bias: false
+    checkpoint_path: null
+    class: Classifier
+    freeze: false
+    input_channels: 128
+    out_activation: null
+    output_channels:
+    - 128
+  encoder:
+    activation:
+      type: leakyrelu
+    bias: true
+    channels:
+    - 16
+    - 32
+    - 64
+    - 128
+    checkpoint_path: null
+    class: ConvEncoder1D
+    dilations: 1
+    dropouts:
+      '0': 0.1
+      '1': 0.1
+      '2': 0.1
+    encode_windows_separately: true
+    freeze: false
+    input_dim:
+    - 6
+    - 3840
+    kernel_sizes:
+      '0': 15
+      '1': 9
+      '2': 5
+      '3': 3
+    last_linear_layer: null
+    out_activation: null
+    paddings:
+      '0': 0
+      '1': 0
+      '2': 0
+      '3': 0
+    poolings:
+      '0':
+        kernel_size: 5
+        type: Max
+      '1':
+        kernel_size: 5
+        type: Max
+      '2':
+        kernel_size: 5
+        type: Max
+      '3':
+        output_size: 1
+        type: AdaptiveAvg
+    stacked_convs: 1
+    strides: 1
+  quantizer:
+    class: SOMQuantizer
+    freeze: false
+    gaussian_neighbourhood:
+      n_epochs: 500
+      omit_center_weight: true
+      sigma_end: 0.1
+    ontopof_ARmodule: false
+    som_nodes: 100
+    transitions: true
+    z_dim: 128
+  type: SOM_CPC
+optimizer:
+  lr: 0.0001
+  type: Adam
+training:
+  aggregate_pred_names:
+  - all_codebook_idxs
+  data_shuffle: true
+  n_epochs: 500
+  random_seed: 1
+  train_batch_size: 128
+  val_batch_size: 128

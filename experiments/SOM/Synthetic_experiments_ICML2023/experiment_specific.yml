@@ -1,0 +1,110 @@
+callbacks:
+  PlotLoss:
+    every_n_epochs: 5
+    zero_class_is_nan_class: false
+  SOMmap:
+    checking_metric: null
+    every_n_epochs: 20
+    nr_nodes: 100
+    zero_class_is_nan_class: false
+  SaveModel:
+    checking_metric: null
+    every_n_epochs: 1
+data:
+  class: MixtureOfSinusoids
+  crop_size: 1
+  include_channels:
+  - x
+  include_train_subjects: all
+  include_val_subjects: all
+  load_dir: random_walk_freq_sinusoids_preprocessed
+  past_windows: 0
+device:
+  cuda: true
+  gpu_idx: null
+losses:
+  SOM_loss:
+    arguments:
+      reduction: sum
+    class: SOM_loss
+    multiplier: 1.0
+  commitment_loss:
+    arguments:
+      reduction: sum
+    class: commitment_loss
+    multiplier: 1.0
+model:
+  type: sequential
+  checkpoint_path: null
+  encoder:
+    activation:
+      type: leakyrelu
+    bias: true
+    channels:
+    - 16
+    - 32
+    - 64
+    - 128
+    checkpoint_path: null
+    class: ConvEncoder1D
+    dilations: 1
+    dropouts:
+      '0': 0.1
+      '1': 0.1
+      '2': 0.1
+    encode_windows_separately: true
+    freeze: true
+    input_dim:
+    - 1
+    - 128
+    kernel_sizes:
+      '0': 9
+      '1': 7
+      '2': 3
+      '3': 3
+    out_activation: null
+    paddings:
+      '0': 4
+      '1': 3
+      '2': 1
+      '3': 1
+    poolings:
+      '0':
+        kernel_size: 4
+        type: Max
+      '1':
+        kernel_size: 4
+        type: Max
+      '2':
+        kernel_size: 4
+        type: Max
+      '3':
+        kernel_size: 2
+        type: Max
+    stacked_convs: 1
+    strides: 1
+  quantizer:
+    checkpoint_path: null
+    class: SOMQuantizer
+    freeze: false
+    gaussian_neighbourhood:
+      n_epochs: 1000
+      omit_center_weight: true
+      sigma_end: 2
+    som_nodes: 100
+    transitions: false
+    z_dim: 128
+  module_order:
+  - encoder
+  - quantizer
+optimizer:
+  lr: 0.001
+  type: Adam
+training:
+  aggregate_pred_names:
+  - all_codebook_idxs
+  data_shuffle: true
+  n_epochs: 1000
+  random_seed: 1
+  train_batch_size: 128
+  val_batch_size: 128
