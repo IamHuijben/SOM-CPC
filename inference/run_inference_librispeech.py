@@ -127,8 +127,10 @@ if __name__ == '__main__':
 
     
     data_type = 'toycase' #or 'mass'
+
+    #Example: 
     config_paths = [
-        Path.cwd() / "SOM_VAE_and_DESOM" / "Audio_experiments_ICML2023" / "DESOM_alpha1e-05_withGRU_decoderonlastC"
+        Path.cwd() / "SOM_VAE_and_DESOM" / "Audio_experiments_ICML2023" / "DESOM_alpha1e-05_withGRU_decoderonlastC",
     ]
 
 

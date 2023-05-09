@@ -23,13 +23,13 @@ if __name__ == "__main__":
     runs = []
     runs_names = []
 
-    # # SOM-VAE runs
-    # for alpha in [0.001, 0.01, 0.1, 1]:    
-    #     runs.append({
-    #     'losses.commitment_loss.multiplier':alpha,
-    #     'losses.SOM_loss.multiplier':alpha/5,
-    #     })
-    #     runs_names.append(f'SOMVAE_alpha{alpha}')
+    # SOM-VAE runs
+    for alpha in [0.001, 0.01, 0.1, 1]:    
+        runs.append({
+        'losses.commitment_loss.multiplier':alpha,
+        'losses.SOM_loss.multiplier':alpha/5,
+        })
+        runs_names.append(f'SOMVAE_alpha{alpha}')
 
     # DESOM runs
     for alpha in [0.000001, 0.00001, 0.0001, 0.001, 0.01]:    
