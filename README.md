@@ -3,7 +3,7 @@ This repository contains all code to reproduce the SOM-CPC paper.
 
 #### Dependencies:
 
-Download the anacond (https://www.anaconda.com/) package and the somperf library (https://github.com/FlorentF9/SOMperf).
+Download the anaconda package (https://www.anaconda.com/) and the somperf library (https://github.com/FlorentF9/SOMperf).
 
 In the anaconda prompt run:
 
