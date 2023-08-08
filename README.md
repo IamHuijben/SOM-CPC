@@ -36,11 +36,12 @@ To run inference on any of the models that include a SOM, you can run the script
 Please cite the following paper if you find this code useful in your work:
 
 ```
-@inproceedings{
-Huijben2023,
-title={SOM-CPC: Unsupervised Contrastive Learning with Self-Organizing Maps for Structured Representations of High-Rate Time Series},
-author={Iris A.M. Huijben, Arthur A. Nijdam, Sebastiaan Overeem, Merel M. van Gilst, Ruud J.G. van Sloun},
-booktitle={International Conference on Machine Learning},
-year={2023},
+@inproceedings{huijben2023,
+  title={Som-cpc: Unsupervised Contrastive Learning with Self-Organizing Maps for Structured Representations of High-Rate Time Series},
+  author={Huijben, Iris AM and Nijdam, Arthur Andreas and Overeem, Sebastiaan and Van Gilst, Merel M and Van Sloun, Ruud},
+  booktitle={International Conference on Machine Learning},
+  pages={14132--14152},
+  year={2023},
+  organization={PMLR}
 }
 ```
