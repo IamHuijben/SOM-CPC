@@ -13,7 +13,7 @@ from modules.reshapings_rescalings import SwapDims
 class InfoNCELoss(nn.Module):
     def __init__(self, pos_samples, neg_samples, reduction='sum', name='infoNCE', **kwargs):
         """ Implements InfoNCEloss from "Representation Learning with Contrastive Predictive Coding, van den Oord et al. (2018).
-        Adapted from: 
+        Adapted from: https://github.com/loeweX/Greedy_InfoMax/blob/master/GreedyInfoMax/audio/models/loss_InfoNCE.py
 
         Args:
             pos_samples (int): Number of positive samples
