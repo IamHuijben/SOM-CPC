@@ -9,48 +9,40 @@ from modules.reshapings_rescalings import SwapDims
 # Z: features in latent space
 # k: future prediction_steps
 # n: negative_samples
-# AR: ARlength
-
 
 class InfoNCELoss(nn.Module):
-    def __init__(self, pos_samples, neg_samples, reduction='sum', apply_on_depths=[], name='infoNCE', **kwargs):
+    def __init__(self, pos_samples, neg_samples, reduction='sum', name='infoNCE', **kwargs):
         """ Implements InfoNCEloss from "Representation Learning with Contrastive Predictive Coding, van den Oord et al. (2018).
         Adapted from: 
 
         Args:
             pos_samples (int): Number of positive samples
             neg_samples (int): Number of negative samles per positive sample.
-            reduction (str): Indicates how the loss should be reduced at the end.
-            apply_on_depths (list, optional): List with integers indicating to which depth level to apply this loss function. If empty list, it is automatically applied to all depths.
-            name (str, optional): [description]. Defaults to 'infoNCE'.
+            reduction (str): Indicates how the loss should be reduced at the end. Only implemented for sum, dividing by batch size happens later.
+            name (str, optional): Defaults to 'infoNCE'.
         """
         super().__init__()
         self.__class__.__name__ = name
         self.pos_samples = pos_samples
         self.neg_samples = neg_samples
-        self.reduction = reduction
-        self.apply_on_depths = apply_on_depths           
+        self.reduction = reduction    
 
         self.CEloss = nn.LogSoftmax(dim=-1)
-        self.permute_0_1 = SwapDims(dims=[0,1])
-        self.permute_1_2 = SwapDims(dims=[1,2])
-        
-        self.weighing_prediction_losses = torch.as_tensor(np.ones((self.pos_samples,))/self.pos_samples, dtype=torch.float32)
         
     def get_pos_f(self, z_pred, z_pos):
         """ Computes the projection of the prediction onto the latent space of the positive samples.
 
         Args:
-            z_pred (torch.tensor): Shape: [[batch_size, pos_samples, features],...] of length #depth_levels
-            z_pos ((torch.tensor): Shape: [[batch_size,, pos_samples, features],...] of length #depth_levels,
+            z_pred (torch.tensor): Shape: [batch_size, pos_samples, features]
+            z_pos (torch.tensor): Shape: [batch_size, pos_samples, features]
 
         Returns:
-            torch.tensor: A list (of length #depth_levels) with projections of the prediction on the negative samples. Shape of each element in the list: [batch_size, pos_samples,1]
+            torch.tensor: Tensor with dot product projections of the latent space predictions to the positive latent spaces. Shape: [batch_size, pos_samples,1]
         """
 
         bs = z_pred.shape[0]
 
-        # First combine the batch size, and the pos_samples dimension before computing the matrix product to prevent a for loop over the positive samples.
+        # First combine the batch size, and the pos_samples dimension before computing the matrix product to prevent a for loop over the number of positive samples.
         z_pos_r = torch.reshape(z_pos, (bs*self.pos_samples, -1))
         z_pred_r = torch.reshape(z_pred, (bs*self.pos_samples, -1))
 
@@ -62,15 +54,15 @@ class InfoNCELoss(nn.Module):
         """ Computes the projection of the prediction onto the latent space of the negative samples.
 
         Args:
-            z_pred (torch.tensor): Shape: [[batch_size, pos_samples, features],...] of length #depth_levels
-            z_neg (torch.tensor): Shape: [[batch_size,, total_nr_neg_samples, features],...] of length #depth_levels, where total_nr_neg_samples corresponds to pos_samples * nr_of_neg_smaples per future prediction.
+            z_pred (torch.tensor): Shape: [batch_size, pos_samples, features]
+            z_neg (torch.tensor): Shape: [batch_size, total_nr_neg_samples, features]. Total_nr_neg_samples corresponds to pos_samples * nr_of_neg_smaples per future prediction.
 
         Returns
-            torch.tensor: A list (of length #depth_levels) with projections of the prediction on the negative samples. Shape of each element in the list: [batch_size, pos_samples, negative_samples]
+       
+            torch.tensor: Tensor with dot product projections of the latent space predictions to the negative latent spaces. Shape:  [batch_size, pos_samples, negative_samples]
         """
 
         bs = z_pred.shape[0]
-
 
         # First combine the batch size, and the pos_samples dimension before computing the matrix product to prevent a for loop over the positive samples.
         z_neg_r = torch.reshape(z_neg, (bs, self.pos_samples, self.neg_samples, -1)) #[BS, pos_samples, neg_samples, feat]
@@ -85,12 +77,12 @@ class InfoNCELoss(nn.Module):
         """ Compute the cross-entropy loss for all future predictions and sum these to return the total InfoNCE loss.
 
         Args:
-            z_pred (list): List (of length #depth_levels) containing torch.tensors with predictions of the current data in future steps. Shape of each element in the list: [batch_size, pos_samples, features]
-            z_neg (list): Latent spaces of negative samples. Shape: [[batch_size,, total_nr_neg_samples, features],...] of length #depth_levels, where total_nr_neg_samples corresponds to pos_samples * nr_of_neg_smaples per future prediction.
-            z_pos (list): Latent spaces of positive samples. Shape: [[batch_size,, pos_samples, features],...] of length #depth_levels,
+            z_pred (torch.Tensor): Predictions of the current data in future steps. Shape: [batch_size, pos_samples, features]
+            z_neg (torch.Tensor): Latent spaces of negative samples. Shape: [batch_size, total_nr_neg_samples, features] 
+            z_pos (torch.Tensor): Latent spaces of positive samples. Shape: [batch_size, pos_samples, features] 
 
         Returns:
-            torch.tensor, torch.tensor: infoNCE loss, infoNCE loss for every future k predictions separately.
+            torch.tensor, torch.tensor: infoNCE loss of shape [batch_size] and infoNCE loss for every future k predictions separately, of shape: [batch_size, pos_samples]
         """
        
         proj_pred_pos =  self.get_pos_f(z_pred, z_pos)  # [BS, k, 1]
@@ -102,20 +94,13 @@ class InfoNCELoss(nn.Module):
         loss_per_future_step = -self.CEloss(results)[...,0] #[BS, k]
 
         # Multiply each loss corresponding to a future prediction with its corresponding multiplier and sum all losses.
-        total_loss = torch.sum(self.weighing_prediction_losses.to(loss_per_future_step.device) * loss_per_future_step, dim=-1) #[BS]
+        total_loss = torch.sum(loss_per_future_step, dim=-1) #[BS]
 
 
         if self.reduction == 'sum':
             return torch.sum(total_loss), torch.sum(loss_per_future_step,0) 
         else:
             raise ValueError
-        
-    def interpret_pred(self, pred, **kwargs):
-        z_pred, z_neg, z_pos = pred['z_pred'], pred['z_neg'], pred['z_pos']
-        return z_pred, z_neg, z_pos 
-
-    def return_final_loss(self, total_loss, loss_per_future_step):
-        return total_loss, {'loss_per_future_step':loss_per_future_step}
 
     def forward(self, pred, **kwargs):
         """[summary]
@@ -126,8 +111,9 @@ class InfoNCELoss(nn.Module):
         Returns:
             torch.tensor: [description]
         """
-        z_pred, z_neg, z_pos  = self.interpret_pred(pred, **kwargs)
-  
+        
+        z_pred, z_neg, z_pos = pred['z_pred'], pred['z_neg'], pred['z_pos']
+
         assert z_pred.shape[0] == z_neg.shape[0] == z_pos.shape[0], 'The batch size is not equal for z_pred, negative and positive samples.'
         assert z_pred.shape[-1] == z_neg.shape[-1] == z_pos.shape[-1], f'The number of features is not equal for z_pred, negative and positive samples {z_pred.shape} {z_neg.shape} {z_pos.shape}.'
 
@@ -135,5 +121,6 @@ class InfoNCELoss(nn.Module):
         assert z_pos.shape[-2] == self.pos_samples
 
         total_loss, loss_per_future_step = self.compute_loss(z_pred, z_neg, z_pos) 
-        return self.return_final_loss(total_loss, loss_per_future_step) 
+        
+        return total_loss, {'loss_per_future_step':loss_per_future_step}
 
