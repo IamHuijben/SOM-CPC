@@ -29,7 +29,7 @@ Note that training the SOM, supervised classifier, or running the fit_pca_kmeans
 
 All model folders contain experiment_specific.yml files that specify all the settings as used in the paper.
 
-##### Runinng inference
+##### Running inference
 To run inference on any of the models that include a SOM, you can run the scripts in the inference/ folder. To evaluate performance with K-means (and PCA), you can use the fit_pca_kmeans.py script in the experiment folder directly, as it fits PCA/K-means on the training set and directly performs inference on the test set.
 
 #### Citation
