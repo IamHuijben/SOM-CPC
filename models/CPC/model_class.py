@@ -110,9 +110,8 @@ class CPCModel(nn.Module):
         for out_var in self.aggregate_pred_names:
             # Only save the last window's prediction in case of an AR model
             if isinstance(pred[out_var], tuple) or isinstance(pred[out_var], list):
-                y_pred_all_steps[out_var].append(pred[out_var][-1]) ###Add it as a list to indicate that we have only 1 depth level. 
-            # without AR model
-            else:
+                y_pred_all_steps[out_var].append(pred[out_var][-1])
+            else: # without AR model
                 y_pred_all_steps[out_var].append(pred[out_var])
 
         return y_pred_all_steps

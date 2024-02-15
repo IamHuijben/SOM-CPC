@@ -90,7 +90,7 @@ class InfoNCELoss(nn.Module):
 
         results = torch.cat((proj_pred_pos, proj_pred_neg), dim=-1)  # [BS, k, 1+n]
 
-        # Calculate the binary cross-entropy loss for all depths, every step in the future and take only the cross-entropy for the positive prediction
+        # Calculate the binary cross-entropy loss for all steps in the future, and take only the cross-entropy for the positive prediction
         loss_per_future_step = -self.CEloss(results)[...,0] #[BS, k]
 
         # Multiply each loss corresponding to a future prediction with its corresponding multiplier and sum all losses.
@@ -103,13 +103,14 @@ class InfoNCELoss(nn.Module):
             raise ValueError
 
     def forward(self, pred, **kwargs):
-        """[summary]
+        """
 
         Args:
-            pred (dict): Dict where each key is an output variable, that contains aggregated predictions at different depth levels. 
+            pred (dict): Dict where each key is an output variable of the model
 
         Returns:
-            torch.tensor: [description]
+            total_loss (torch.tensor): The InfoNCE loss value
+            extra_losses (dict): Dict with additional losses, that may be used for callbacks or logging purposes.
         """
         
         z_pred, z_neg, z_pos = pred['z_pred'], pred['z_neg'], pred['z_pos']
