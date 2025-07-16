@@ -1,5 +1,6 @@
 ### SOM-CPC
-This repository contains all code to reproduce the paper "SOM-CPC: Unsupervised Contrastive Learning with Self-Organizing Maps for Structured Representations of High-Rate Time Seriespublished", which was published at ICML, 2023.
+This repository contains all code to reproduce the paper "SOM-CPC: Unsupervised Contrastive Learning with Self-Organizing Maps for Structured Representations of High-Rate Time Series", which was published at ICML, 2023.
+
 It will soon also contains a simplified version of the code that was used in "Deep clustering of polysomnography data to characterize sleep structure in healthy sleep and non-rapid eye movement parasomnias", published in Journal of Neuroscience Methods, 2025.
 
 #### Dependencies:
