@@ -1,8 +1,10 @@
 ### SOM-CPC
 This repository contains all code to reproduce the paper "SOM-CPC: Unsupervised Contrastive Learning with Self-Organizing Maps for Structured Representations of High-Rate Time Series", which was published at ICML, 2023.
 
-Moreover, in experiments/SOM_CPC/2025_JournNeuroscienceMethods_experiments it contains the exact settings ofr the models that were run in the paper "Deep clustering of polysomnography data to characterize sleep structure in healthy sleep and non-rapid eye movement parasomnias", published in Journal of Neuroscience Methods, 2025.
+Moreover, in experiments/SOM_CPC/2025_JournNeuroscienceMethods_experiments it contains the exact settings for the models that were run in the paper "Deep clustering of polysomnography data to characterize sleep structure in healthy sleep and non-rapid eye movement parasomnias", published in Journal of Neuroscience Methods, 2025.
 
+#### Contact:
+If you need some help or you want to discuss a possible collaboration, feel free to get into contact via: iris.huijben@maastrichtuniversity.nl 
 
 #### Dependencies:
 
