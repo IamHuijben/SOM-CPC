@@ -63,6 +63,12 @@ class SOM_CPC(nn.Module):
         return all_codebook_idxs, all_codebook_idxs_neighbours, neighbour_weighing, z, distance_matrix
 
     def forward(self, inp, epoch=None, **kwargs):
+        """
+        The model as input a tuple with the following elements:
+        x: torch.Tensor of size: [batch_size, channels, window_size_in_samples]
+        neg_samples: torch.Tensor of size: [batch_size, total_num_negative_samples, channels, window_size_in_samples]
+        pos_samples: torch.Tensor of size: [batch_size, pos_samples, channels, window_size_in_samples]
+        """
         x, neg_samples, pos_samples = inp
                     
         assert x.shape[0] == neg_samples.shape[0] == pos_samples.shape[0], 'The batch_size dimension is different for x, neg_samples and pos_samples.'
