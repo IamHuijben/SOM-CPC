@@ -57,11 +57,12 @@ If you are interested in using SOM-CPC for discovering structure in polysomnogra
   title={Deep clustering of polysomnography data to characterize sleep structure in healthy sleep and non-rapid eye movement parasomnias},
   author={Huijben, Iris AM and van Sloun, Ruud JG and Pijpers, Angelique and Overeem, Sebastiaan, and van Gilst, Merel M},
   journal = {Journal of Neuroscience Methods},
+  volume = {423},
   pages = {110516},
   year = {2025},
   issn = {0165-0270},
   doi = {https://doi.org/10.1016/j.jneumeth.2025.110516},
-  pages={14132--14152},
+  url = {https://www.sciencedirect.com/science/article/pii/S0165027025001608},
 }
 ```
 
